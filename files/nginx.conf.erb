@@ -1,0 +1,39 @@
+require 'erb'
+
+template = ERB.new <<-EOF
+events {
+  worker_connections  4096;  ## Default: 1024
+}
+
+http {
+    server {
+
+    <% if ENV['SSL_CERTIFICATE'] && ENV['SSL_CERTIFICATE_KEY'] %> 
+    listen 8443 ssl;
+    listen [::]:8443 ssl;
+    ssl_protocols       TLSv1 TLSv1.1 TLSv1.2;
+    ssl_ciphers         HIGH:!aNULL:!MD5;
+    <% else %>
+    listen 8080;
+    listen [::]:8080;
+    <% end %>
+
+    <% if ENV['SSL_CERTIFICATE'] && ENV['SSL_CERTIFICATE_KEY'] %>  
+    ssl on;
+    ssl_certificate <%= ENV['SSL_CERTIFICATE'] %>;
+    ssl_certificate_key <%= ENV['SSL_CERTIFICATE_KEY'] %>;
+    <% end %>
+
+    <% if ENV['SERVER_NAME'] %>    
+    server_name <%= ENV['SERVER_NAME'] %>;
+    <% end %>
+
+    root <%= ENV['APK_ROOT'] %>;
+
+    location / {
+        autoindex on;
+    }
+  }
+}
+EOF
+puts template.result(binding)

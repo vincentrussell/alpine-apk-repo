@@ -1,0 +1,50 @@
+#https://www.erianna.com/creating-a-alpine-linux-repository/
+#https://pkgs.org/search/?q=zip
+#https://dl-cdn.alpinelinux.org/alpine/v3.6/main/x86_64/
+
+build:
+
+docker build --progress=string -t temp .
+
+build:
+
+sudo docker-compose build && sudo docker-compose up
+
+
+build certs:
+
+docker run -e CERT_GEN=true temp
+
+
+
+ docker run --network alpine-repo_default -it alpine:3.17.2 /bin/sh
+vi /etc/apk/repositores
+   http://alpine-repo:8080/v3.6/main
+
+cp public key to /etc/apk/keys/signature.rsa.pub
+
+
+apk add -X http://alpine-repo:8080/v3.6/main -u alpine-keys
+
+
+apk add sudo --update-cache --repository http://alpine-repo:8080/v3.6/main --allow-untrusted
+
+
+
+
+
+wget -P /etc/apk/keys/ http://alpine-repo:8080/docker-63f156e6.rsa.pub
+mv docker-63f156e6.rsa.pub alpine-devel@alpine-repo-63f156e6.rsa.pub
+
+
+docker run --network alpine-repo_default -v ./certs/ca.pem:/tmp/ca.pem -v ./certs/server.id_rsa.pub:/tmp/id_rsa.pub -it alpine:3.17.2 /bin/sh
+
+apk add wget ca-certificates
+rm -rf /etc/apk/keys/*
+cp /tmp/id_rsa.pub /etc/apk/keys/
+cp /tmp/ca.pem /etc/ssl/certs/ca-cert-alpine-repo.pem
+#wget -k --no-check-certificate -q -O /etc/apk/keys/alpine-devel@alpine-repo-63f156e6.rsa.pub https://alpine-repo:8443/docker-63f23386.rsa.pub
+#cp /etc/apk/keys/alpine-devel@alpine-repo-63f156e6.rsa.pub /etc/ssl/certs
+update-ca-certificates
+
+echo "https://alpine-repo:8443/v3.6/main" > /etc/apk/repositories

@@ -1,0 +1,9 @@
+*.pem
+*.jks
+*.cert
+*.ca
+*.p12
+*.crt
+*.key
+*_rsa
+*_rsa.pub

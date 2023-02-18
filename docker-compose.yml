@@ -1,0 +1,19 @@
+services:
+  alpine-repo:
+    container_name: alpine-repo
+    build: .
+    environment:
+       - placeholder=true
+   #   - CERT_GEN=true
+       - SERVER_NAME=localhost
+       - SSL_CERTIFICATE=/cert/server.cert
+       - SSL_CERTIFICATE_KEY=/cert/server.key
+    ports:
+    - 8080:8080
+    - 8443:8443
+    volumes:
+      - ./alpine-repo:/apk/v3.6/main/x86_64
+      - ./certs/server.crt:/cert/server.cert
+      - ./certs/server.key:/cert/server.key
+      - ./certs/server.id_rsa:/certs/repo.rsa.private.key
+      - ./certs/server.id_rsa.pub:/certs/repo.rsa.public.key
